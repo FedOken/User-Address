@@ -9,6 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use app\models\User;
 
 AppAsset::register($this);
 ?>
@@ -35,33 +36,35 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+
+    $navItems = [];
+    if ( Yii::$app->user->isGuest) {
+        $navItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+    } else {
+    	if (Yii::$app->user->can(User::ROLE_ADMIN)) {
+            $navItems[] = ['label' => 'Users', 'url' => ['/user']];
+
+	    } elseif (Yii::$app->user->can(User::ROLE_USER)) {
+            $navItems[] = ['label' => 'My profile', 'url' => ['/user/view?id='.Yii::$app->user->identity->id]];
+	    }
+
+        $navItems[] = ['label' => 'Addresses', 'url' => ['/address']];
+        $navItems[] =
+            '<li>'
+            .Html::beginForm(['/site/logout'], 'post')
+            .Html::submitButton('Logout (' . Yii::$app->user->identity->login . ')', ['class' => 'btn btn-link logout'])
+            .Html::endForm()
+            .'</li>';
+    }
+
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
-        ],
+        'items' => $navItems,
     ]);
     NavBar::end();
     ?>
 
     <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>

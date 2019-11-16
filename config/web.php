@@ -5,9 +5,10 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'name' => 'Bintime test',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
-    'defaultRoute' => 'site/index',
+    'defaultRoute' => 'user/index',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -17,6 +18,10 @@ $config = [
             'baseUrl'=> '',
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'QzGLQxIcv7vdP6dLae1p39I_WaBvYVsU',
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'defaultRoles' => ['admin', 'user'],
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -52,6 +57,11 @@ $config = [
             'rules' => [
                 '<controller>/<action>' => '<controller>/<action>'
             ],
+        ],
+        'formatter' => [
+            'class'           => 'yii\i18n\Formatter',
+            //'defaultTimeZone' => 'Europe/Kiev',
+            'defaultTimeZone' => '+3',
         ],
     ],
     'params' => $params,
